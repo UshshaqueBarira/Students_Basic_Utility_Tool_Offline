@@ -1,10 +1,6 @@
 services:
   - type: web
     name: human-utility-ai-hub
-    runtime: python
-    buildCommand: pip install --upgrade pip && pip install -r requirements.txt
+    env: python
+    buildCommand: pip install -r requirements.txt
     startCommand: python app.py
-    healthCheckPath: /
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.11.9
