@@ -1,0 +1,23 @@
+# Utility Hub Dependencies
+
+# Core Web UI
+gradio>=4.0.0
+
+# Image & Media Processing
+Pillow>=10.0.0
+opencv-python-headless>=4.8.0
+numpy<2.0.0
+
+# PDF Toolkit
+pypdf>=3.15.0
+PyMuPDF>=1.23.0
+
+# Background Remover
+rembg>=2.0.50
+
+# AI Image Enhancer Dependencies
+torch
+torchvision
+realesrgan
+facexlib
+cryptography

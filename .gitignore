@@ -1,0 +1,11 @@
+# Python build and local runtime files
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+temp/
+models/
+outputs/
+
+# Local encrypted password vault -- do not publish it
+vault.enc
