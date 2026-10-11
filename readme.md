@@ -45,3 +45,5 @@ Ensure you have Python 3.9+ installed on your system.
    ```bash
    git clone [https://github.com/your-username/human-utility-ai-hub.git](https://github.com/your-username/human-utility-ai-hub.git)
    cd human-utility-ai-hub
+
+Link to the deployed app: https://studentsbasicutilitytooloffline.streamlit.app/
