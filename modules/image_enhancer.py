@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageEnhance, ImageFilter
 from cv2 import cvtColor, COLOR_RGB2BGR, COLOR_BGR2RGB
 from realesrgan import RealESRGANer
 from realesrgan.archs.srvgg_arch import SRVGGNetCompact
@@ -36,29 +36,40 @@ def get_upsampler():
     return _UPSAMPLER
 
 
-def enhance_image_quality(pil_img, upscale_factor=2):
-    """Enhances photo quality using RealESRGAN without basicSR."""
+def enhance_image_quality(
+    pil_img, sharpen_factor=1.0, contrast_factor=1.0, color_factor=1.0, upscale_factor=1
+):
     if pil_img is None:
         return None, "Please upload an image."
 
-    orig_w, orig_h = pil_img.size
-    img_np = np.array(pil_img.convert("RGB"))
-    img_bgr = cvtColor(img_np, COLOR_RGB2BGR)
+    res = pil_img.copy()
+    orig_w, orig_h = res.size
 
-    try:
-        upsampler = get_upsampler()
-        output_bgr, _ = upsampler.enhance(img_bgr, outscale=int(upscale_factor))
-        output_rgb = cvtColor(output_bgr, COLOR_BGR2RGB)
-        res = Image.fromarray(output_rgb)
-    except Exception as e:
-        # Fallback to Lanczos scaling if model inference fails
-        scale = int(upscale_factor)
-        res = pil_img.resize((orig_w * scale, orig_h * scale), Image.Resampling.LANCZOS)
+    # Adjust Sharpness
+    if sharpen_factor is not None and sharpen_factor != 1.0:
+        enhancer = ImageEnhance.Sharpness(res)
+        res = enhancer.enhance(float(sharpen_factor))
+
+    # Adjust Contrast
+    if contrast_factor is not None and contrast_factor != 1.0:
+        enhancer = ImageEnhance.Contrast(res)
+        res = enhancer.enhance(float(contrast_factor))
+
+    # Adjust Color Saturation
+    if color_factor is not None and color_factor != 1.0:
+        enhancer = ImageEnhance.Color(res)
+        res = enhancer.enhance(float(color_factor))
+
+    # Super-Resolution Upscaling
+    scale = int(upscale_factor) if upscale_factor else 1
+    if scale > 1:
+        res = res.resize((orig_w * scale, orig_h * scale), Image.Resampling.LANCZOS)
+        res = res.filter(ImageFilter.DETAIL)
 
     new_w, new_h = res.size
     stats = (
         f"Original Resolution: {orig_w}x{orig_h}px | "
-        f"Enhanced Resolution: {new_w}x{new_h}px ({upscale_factor}x RealESRGAN Upscaled)"
+        f"Enhanced Resolution: {new_w}x{new_h}px ({scale}x Upscaled)"
     )
 
     return res, stats
